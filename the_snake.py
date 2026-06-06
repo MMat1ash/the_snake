@@ -9,7 +9,8 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
-START_POSITION = ((GRID_WIDTH // 2) * GRID_SIZE, (GRID_HEIGHT // 2) * GRID_SIZE)
+START_POSITION = ((GRID_WIDTH // 2) * GRID_SIZE, (GRID_HEIGHT // 2)
+                  * GRID_SIZE)
 UP = (0, -1)
 DOWN = (0, 1)
 LEFT = (-1, 0)
@@ -79,8 +80,8 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """Объект змейки, описывающий логику и поведение.
-    
-    Обеспечивает движение, отрисовку, обработку событий 
+
+    Обеспечивает движение, отрисовку, обработку событий
     и другие аспекты поведения змейки в игре.
     """
 
@@ -101,14 +102,16 @@ class Snake(GameObject):
 
     def move(self):
         """Обновляет позицию змейки на игровом поле.
-        
-        Добавляя новую голову в начало списка positions и удаляя 
+
+        Добавляя новую голову в начало списка positions и удаляя
         последний элемент, если длина змейки не увеличилась.
         """
-        current_head_x, current_head_y = self.get_head_position()  
+        current_head_x, current_head_y = self.get_head_position()
         direction_x, direction_y = self.direction
-        new_x_position = (current_head_x + direction_x * GRID_SIZE) % SCREEN_WIDTH
-        new_y_position = (current_head_y + direction_y * GRID_SIZE) % SCREEN_HEIGHT
+        shift_x = direction_x * GRID_SIZE
+        shift_y = direction_y * GRID_SIZE
+        new_x_position = (current_head_x + shift_x) % SCREEN_WIDTH
+        new_y_position = (current_head_y + shift_y) % SCREEN_HEIGHT
         new_head_position = (new_x_position, new_y_position)
         self.positions.insert(0, new_head_position)
         self.last = self.positions[-1]
@@ -131,13 +134,13 @@ class Snake(GameObject):
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
     def get_head_position(self):
-        """Возвращает позицию головы змейки (первый элемент в списке positions)."""
-        return self.positions[0] 
+        """Возвращает позицию головы змейки."""
+        return self.positions[0]
 
     def reset(self):
         """Восстанавливает базовые параметры змейки при начале новой игры."""
         self.length = 1
-        self.positions = [self.position] # Возвращаем на старт
+        self.positions = [self.position]
         self.direction = RIGHT            # Сбрасываем направление
         self.next_direction = None
         self.last = None
@@ -166,8 +169,9 @@ def main():
 
         apple.draw()
         snake.draw()
-        
+
         pygame.display.update()
+
 
 if __name__ == '__main__':
     main()
