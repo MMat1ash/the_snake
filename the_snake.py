@@ -61,8 +61,7 @@ class GameObject:
 
     def draw_rect(self, position, color=None):
         """Отрисовывает квадрат по координатам."""
-        if color is None:
-            color = self.body_color
+        color = color or self.body_color
 
         rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, color, rect)
@@ -77,20 +76,16 @@ class GameObject:
 class Apple(GameObject):
     """Объект яблока, определяющий его цвет, позицию, отрисовку."""
 
-    def __init__(self, snake_positions=None):
-        super().__init__(body_color=APPLE_COLOR)
+    def __init__(self, occupied_cells=None, body_color=APPLE_COLOR):
+        super().__init__(body_color=body_color)
+        self.randomize_position(occupied_cells or [])
 
-        if snake_positions is None:
-            snake_positions = []
-
-        self.randomize_position(snake_positions)
-
-    def randomize_position(self, snake_positions):
+    def randomize_position(self, occupied_cells):
         """Устанавливает случайное положение яблока на игровом поле."""
         while True:
             position_x = randint(0, GRID_WIDTH - 1) * GRID_SIZE
             position_y = randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-            if (position_x, position_y) not in snake_positions:
+            if (position_x, position_y) not in occupied_cells:
                 self.position = (position_x, position_y)
                 break
 
@@ -106,8 +101,8 @@ class Snake(GameObject):
     и другие аспекты поведения змейки в игре.
     """
 
-    def __init__(self):
-        super().__init__(position=START_POSITION, body_color=SNAKE_COLOR)
+    def __init__(self, position=START_POSITION, body_color=SNAKE_COLOR):
+        super().__init__(position=position, body_color=body_color)
         self.reset()
 
     def update_direction(self):
@@ -173,8 +168,7 @@ def main():
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake.positions)
-
-        if snake.get_head_position() in snake.positions[4:]:
+        elif snake.get_head_position() in snake.positions[4:]:
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
             apple.randomize_position(snake.positions)
